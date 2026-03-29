@@ -5,7 +5,7 @@ namespace BoycoT_Virtual_ZPL_Printer
 {
     internal class PrinterTest
     {
-        private static string zplToPrint;
+        private static string? zplToPrint;
 
         public static bool SendTestLabelToPrinter(string printerName = "Virtual ZPL Printer")
         {
@@ -14,26 +14,17 @@ namespace BoycoT_Virtual_ZPL_Printer
                 string testZpl = Properties.Settings.Default.TestLabel;
 
                 if (string.IsNullOrEmpty(testZpl))
-                {
                     throw new Exception("Test ZPL label not found in settings.");
-                }
 
                 zplToPrint = testZpl;
 
-                // Create a PrintDocument
                 PrintDocument printDoc = new PrintDocument();
                 printDoc.PrinterSettings.PrinterName = printerName;
 
-                // Check if printer exists
                 if (!printDoc.PrinterSettings.IsValid)
-                {
                     throw new Exception($"Printer '{printerName}' not found or is not available.");
-                }
 
-                // Set to print raw data
                 printDoc.PrintPage += PrintDoc_PrintPage;
-
-                // Send to printer
                 printDoc.Print();
 
                 return true;
@@ -44,20 +35,21 @@ namespace BoycoT_Virtual_ZPL_Printer
                     $"Failed to send test label to printer: {ex.Message}",
                     "Print Test Failed",
                     System.Windows.Forms.MessageBoxButtons.OK,
-                    System.Windows.Forms.MessageBoxIcon.Error
-                );
+                    System.Windows.Forms.MessageBoxIcon.Error);
                 return false;
             }
         }
 
         private static void PrintDoc_PrintPage(object sender, PrintPageEventArgs e)
         {
-            // Send raw ZPL data to the printer
+            if (zplToPrint is null) return;
+
             byte[] zplBytes = Encoding.UTF8.GetBytes(zplToPrint);
 
-            // Write directly to printer stream as raw data
-            IntPtr hPrinter;
-            if (RawPrinterHelper.OpenPrinter(((PrintDocument)sender).PrinterSettings.PrinterName, out hPrinter, IntPtr.Zero))
+            if (RawPrinterHelper.OpenPrinter(
+                    ((PrintDocument)sender).PrinterSettings.PrinterName,
+                    out IntPtr hPrinter,
+                    IntPtr.Zero))
             {
                 try
                 {
@@ -71,7 +63,6 @@ namespace BoycoT_Virtual_ZPL_Printer
         }
     }
 
-    // Helper class for sending raw data to printer
     internal class RawPrinterHelper
     {
         [System.Runtime.InteropServices.DllImport("winspool.drv", CharSet = System.Runtime.InteropServices.CharSet.Auto)]
@@ -95,13 +86,14 @@ namespace BoycoT_Virtual_ZPL_Printer
         [System.Runtime.InteropServices.DllImport("winspool.drv")]
         public static extern bool WritePrinter(IntPtr hPrinter, byte[] pBytes, int dwCount, out int dwWritten);
 
-        [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential, CharSet = System.Runtime.InteropServices.CharSet.Auto)]
+        [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential,
+            CharSet = System.Runtime.InteropServices.CharSet.Auto)]
         public struct DOC_INFO_1
         {
             [System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.LPTStr)]
             public string pDocName;
             [System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.LPTStr)]
-            public string pOutputFile;
+            public string? pOutputFile;
             [System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.LPTStr)]
             public string pDataType;
         }
@@ -124,8 +116,7 @@ namespace BoycoT_Virtual_ZPL_Printer
                 return false;
             }
 
-            int dwWritten;
-            bool success = WritePrinter(hPrinter, pBytes, pBytes.Length, out dwWritten);
+            bool success = WritePrinter(hPrinter, pBytes, pBytes.Length, out int dwWritten);
 
             EndPagePrinter(hPrinter);
             EndDocPrinter(hPrinter);
