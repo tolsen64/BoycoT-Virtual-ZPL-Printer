@@ -2,7 +2,7 @@
 
 Save label stock whenever you are testing or creating labels.
 
-<img width="802" height="529" alt="image" src="https://github.com/user-attachments/assets/53ccb4dc-edba-45d3-9363-e022e774d888" />
+<img width="1002" height="657" alt="image" src="https://github.com/user-attachments/assets/2b35ac05-28fa-4770-9888-9d2315e6a767" />
 
 Create the printer port 9100 and driver "Generic / Text Only".
 
