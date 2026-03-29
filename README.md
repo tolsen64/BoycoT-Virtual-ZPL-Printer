@@ -12,3 +12,4 @@ Create the printer and connect it to the above port.
 
 <img width="1033" height="428" alt="image" src="https://github.com/user-attachments/assets/72bd21b5-0f0b-4ec7-92bc-7c7191b5dde3" />
 
+[![Hit Counter](http://tolsen64.com:8080/hc/index.php?id=GitHub.Virtual-ZPL-Printer)]("My Stupid Hit Counter!")
